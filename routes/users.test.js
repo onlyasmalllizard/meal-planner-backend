@@ -437,7 +437,7 @@ describe('Unit Tests: users/:id', () => {
     usersModel.deleteUser.mockRestore();
   });
 
-  test.skip('Upon an unsuccessful DELETE request due to server error, the correct response is returned', () => {
+  test.skip('Upon an unsuccessful DELETE request due to server error, the correct response is returned', async () => {
     // Arrange
     const id = 1;
     const expected = {
