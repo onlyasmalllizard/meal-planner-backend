@@ -25,10 +25,8 @@ describe('Unit Tests: households', () => {
       ];
     });
 
-    // Act
-    const actual = await request(router).get('/');
-
-    // Assert
+    // Act and Assert
+    const actual = await request(router).get('/').expect(200);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -40,7 +38,6 @@ describe('Unit Tests: households', () => {
     const expected = {
       message: `Bad Request: Couldn't retrieve households`,
       success: false,
-      status: 400,
     };
 
     jest.spyOn(householdsModel, 'getHouseholds');
@@ -48,10 +45,8 @@ describe('Unit Tests: households', () => {
       throw new Error(`Bad Request: Couldn't retrieve households`);
     });
 
-    // Act
-    const actual = await request(router).get('/');
-
-    // Assert
+    // Act and Assert
+    const actual = await request(router).get('/').expect(400);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -63,7 +58,6 @@ describe('Unit Tests: households', () => {
     const expected = {
       message: `Server Error: Couldn't retrieve households`,
       success: false,
-      status: 500,
     };
 
     jest.spyOn(householdsModel, 'getHouseholds');
@@ -71,10 +65,8 @@ describe('Unit Tests: households', () => {
       throw new Error(`Server Error: Couldn't retrieve households`);
     });
 
-    // Act
-    const actual = await request(router).get('/');
-
-    // Assert
+    // Act and Assert
+    const actual = await request(router).get('/').expect(500);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -96,10 +88,8 @@ describe('Unit Tests: households', () => {
       return { id: 5, ...data };
     });
 
-    // Act
-    const actual = await request(router).post('/').send(input);
-
-    // Assert
+    // Act and Assert
+    const actual = await request(router).post('/').send(input).expect(200);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -113,7 +103,6 @@ describe('Unit Tests: households', () => {
     const expected = {
       message: `Bad Request: Couldn't add Household ${input.name}`,
       success: false,
-      status: 400,
     };
 
     jest.spyOn(householdsModel, 'addHousehold');
@@ -121,10 +110,8 @@ describe('Unit Tests: households', () => {
       throw new Error(`Bad Request: Couldn't add Household ${data.name}`);
     });
 
-    // Act
-    const actual = await request(router).post('/').send(input);
-
-    // Assert
+    // Act and Assert
+    const actual = await request(router).post('/').send(input).expect(400);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -138,7 +125,6 @@ describe('Unit Tests: households', () => {
     const expected = {
       message: `Server Error: Couldn't add Household ${input.name}`,
       success: false,
-      status: 500,
     };
 
     jest.spyOn(householdsModel, 'addHousehold');
@@ -146,10 +132,8 @@ describe('Unit Tests: households', () => {
       throw new Error(`Server Error: Couldn't add Household ${data.name}`);
     });
 
-    // Act
-    const actual = await request(router).post('/').send(input);
-
-    // Assert
+    // Act and Assert
+    const actual = await request(router).post('/').send(input).expect(500);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -176,10 +160,8 @@ describe('Unit Tests: households/:id', () => {
       return { id: householdId, name: 'Mock Household', occupants: [1] };
     });
 
-    // Act
-    const actual = request(router).get(`/${id}`);
-
-    // Assert
+    // Act and Assert
+    const actual = request(router).get(`/${id}`).expect(200);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -192,7 +174,6 @@ describe('Unit Tests: households/:id', () => {
     const expected = {
       message: `Bad Request: Couldn't retrieve Household ${id}`,
       success: false,
-      status: 400,
     };
 
     jest.spyOn(householdsModel, 'getHouseholdById');
@@ -202,10 +183,8 @@ describe('Unit Tests: households/:id', () => {
       );
     });
 
-    // Act
-    const actual = request(router).get(`/${id}`);
-
-    // Assert
+    // Act and Assert
+    const actual = request(router).get(`/${id}`).expect(400);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -218,7 +197,6 @@ describe('Unit Tests: households/:id', () => {
     const expected = {
       message: `Server Error: Couldn't retrieve Household ${id}`,
       success: false,
-      status: 500,
     };
 
     jest.spyOn(householdsModel, 'getHouseholdById');
@@ -228,10 +206,8 @@ describe('Unit Tests: households/:id', () => {
       );
     });
 
-    // Act
-    const actual = request(router).get(`/${id}`);
-
-    // Assert
+    // Act and Assert
+    const actual = request(router).get(`/${id}`).expect(500);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -267,10 +243,11 @@ describe('Unit Tests: households/:id', () => {
       }
     );
 
-    // Act
-    const actual = await request(router).patch(`/${id}`).send(input);
-
-    // Assert
+    // Act and Assert
+    const actual = await request(router)
+      .patch(`/${id}`)
+      .send(input)
+      .expect(200);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -284,7 +261,6 @@ describe('Unit Tests: households/:id', () => {
     const expected = {
       message: `Bad Request: Couldn't update Household ${id}`,
       success: false,
-      status: 400,
     };
 
     jest.spyOn(householdsModel, 'updateHouseholdById');
@@ -296,10 +272,11 @@ describe('Unit Tests: households/:id', () => {
       }
     );
 
-    // Act
-    const actual = await request(router).patch(`/${id}`).send(input);
-
-    // Assert
+    // Act and Assert
+    const actual = await request(router)
+      .patch(`/${id}`)
+      .send(input)
+      .expect(400);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -313,7 +290,6 @@ describe('Unit Tests: households/:id', () => {
     const expected = {
       message: `Server Error: Couldn't update Household ${id}`,
       success: false,
-      status: 500,
     };
 
     jest.spyOn(householdsModel, 'updateHouseholdById');
@@ -325,10 +301,12 @@ describe('Unit Tests: households/:id', () => {
       }
     );
 
-    // Act
-    const actual = await request(router).patch(`/${id}`).send(input);
+    // Act and Assert
+    const actual = await request(router)
+      .patch(`/${id}`)
+      .send(input)
+      .expect(500);
 
-    // Assert
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -356,10 +334,8 @@ describe('Unit Tests: households/:id', () => {
       }
     );
 
-    // Act
-    const actual = await request(router).put(`/${id}`).send(input);
-
-    // Assert
+    // Act and Assert
+    const actual = await request(router).put(`/${id}`).send(input).expect(200);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -373,7 +349,6 @@ describe('Unit Tests: households/:id', () => {
     const expected = {
       message: `Bad Request: Couldn't update Household ${id}`,
       success: false,
-      status: 400,
     };
 
     jest.spyOn(householdsModel, 'overwriteHouseholdById');
@@ -385,10 +360,8 @@ describe('Unit Tests: households/:id', () => {
       }
     );
 
-    // Act
-    const actual = await request(router).put(`/${id}`).send(input);
-
-    // Assert
+    // Act and Assert
+    const actual = await request(router).put(`/${id}`).send(input).expect(400);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -402,7 +375,6 @@ describe('Unit Tests: households/:id', () => {
     const expected = {
       message: `Server Error: Couldn't update Household ${id}`,
       success: false,
-      status: 500,
     };
 
     jest.spyOn(householdsModel, 'overwriteHouseholdById');
@@ -414,10 +386,8 @@ describe('Unit Tests: households/:id', () => {
       }
     );
 
-    // Act
-    const actual = await request(router).put(`/${id}`).send(input);
-
-    // Assert
+    // Act and Assert
+    const actual = await request(router).put(`/${id}`).send(input).expect(500);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -446,10 +416,8 @@ describe('Unit Tests: households/:id', () => {
       };
     });
 
-    // Act
-    const actual = await request(router).delete(`/${id}`);
-
-    // Assert
+    // Act and Assert
+    const actual = await request(router).delete(`/${id}`).expect(200);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -462,7 +430,6 @@ describe('Unit Tests: households/:id', () => {
     const expected = {
       message: `Bad Request: Couldn't delete Household ${id}`,
       success: false,
-      status: 400,
     };
 
     jest.spyOn(householdsModel, 'deleteHousehold');
@@ -470,10 +437,8 @@ describe('Unit Tests: households/:id', () => {
       throw new Error(`Bad Request: Couldn't delete Household ${householdId}`);
     });
 
-    // Act
-    const actual = await request(router).delete(`/${id}`);
-
-    // Assert
+    // Act and Assert
+    const actual = await request(router).delete(`/${id}`).expect(400);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
@@ -486,7 +451,6 @@ describe('Unit Tests: households/:id', () => {
     const expected = {
       message: `Server Error: Couldn't delete Household ${id}`,
       success: false,
-      status: 500,
     };
 
     jest.spyOn(householdsModel, 'deleteHousehold');
@@ -494,10 +458,8 @@ describe('Unit Tests: households/:id', () => {
       throw new Error(`Server Error: Couldn't delete Household ${householdId}`);
     });
 
-    // Act
-    const actual = await request(router).delete(`/${id}`);
-
-    // Assert
+    // Act and Assert
+    const actual = await request(router).delete(`/${id}`).expect(500);
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
