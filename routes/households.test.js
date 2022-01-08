@@ -1,6 +1,5 @@
 const request = require('supertest');
 const router = require('./households');
-
 const householdsModel = require('../models/households');
 
 describe('Unit Tests: households', () => {
