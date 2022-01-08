@@ -4,33 +4,38 @@ const router = require('./households');
 const householdsModel = require('../models/households');
 
 describe('Unit Tests: households/:id', () => {
-  test('Upon a successful GET request, the correct response is returned', async () => {
-    // Arrange
-    const id = 1;
-    const expected = {
-      message: `Household ${id}`,
-      success: true,
-      payload: {
-        id,
-        name: expect.any(String),
-        occupants: expect.arrayContaining(expect.any(Object)),
-      },
-    };
+  test.todo(
+    'Upon a successful GET request, the correct response is returned',
+    async () => {
+      // Arrange
+      const id = 1;
+      const expected = {
+        message: `Household ${id}`,
+        success: true,
+        payload: {
+          id,
+          name: expect.any(String),
+          occupants: expect.arrayContaining(expect.any(Number)),
+        },
+      };
 
-    jest.spyOn(householdsModel, 'getHouseholdById');
-    householdsModel.getHouseholdById.mockImplementation(async (householdId) => {
-      return { id: householdId, name: 'Mock Household', occupants: [{}] };
-    });
+      jest.spyOn(householdsModel, 'getHouseholdById');
+      householdsModel.getHouseholdById.mockImplementation(
+        async (householdId) => {
+          return { id: householdId, name: 'Mock Household', occupants: [1] };
+        }
+      );
 
-    // Act
-    const actual = request(router).get(`/${id}`);
+      // Act
+      const actual = request(router).get(`/${id}`);
 
-    // Assert
-    expect(actual).toStrictEqual(expected);
+      // Assert
+      expect(actual).toStrictEqual(expected);
 
-    // Cleanup
-    householdsModel.getHouseholdById.mockRestore();
-  });
+      // Cleanup
+      householdsModel.getHouseholdById.mockRestore();
+    }
+  );
 
   test.todo(
     'Upon an unsuccessful GET request due to user error, the correct response is returned',
@@ -106,7 +111,7 @@ describe('Unit Tests: households/:id', () => {
         payload: {
           id,
           name: input.name,
-          occupants: expect.arrayContaining(expect.any(Object)),
+          occupants: expect.arrayContaining(expect.any(Number)),
         },
       };
 
@@ -114,7 +119,11 @@ describe('Unit Tests: households/:id', () => {
       householdsModel.updateHouseholdById.mockImplementation(
         async (householdId, data) => {
           const keys = Object.keys(data);
-          const object = { id: householdId, name: 'Old Name', occupants: [{}] };
+          const object = {
+            id: householdId,
+            name: 'Old Name',
+            occupants: [1, 2],
+          };
 
           keys.forEach((key) => (object[key] = data[key]));
           return object;
@@ -201,7 +210,7 @@ describe('Unit Tests: households/:id', () => {
     async () => {
       // Arrange
       const id = 1;
-      const input = { name: 'New Name', occupants: [{}] };
+      const input = { name: 'New Name', occupants: [4, 2] };
       const expected = {
         message: `Server Error: Couldn't update Household ${id}`,
         success: true,
@@ -235,7 +244,7 @@ describe('Unit Tests: households/:id', () => {
     async () => {
       // Arrange
       const id = 1;
-      const input = { name: 'New Name', occupants: [{}] };
+      const input = { name: 'New Name', occupants: [4, 2] };
       const expected = {
         message: `Bad Request: Couldn't update Household ${id}`,
         success: false,
@@ -267,7 +276,7 @@ describe('Unit Tests: households/:id', () => {
     async () => {
       // Arrange
       const id = 1;
-      const input = { name: 'New Name', occupants: [{}] };
+      const input = { name: 'New Name', occupants: [4, 2] };
       const expected = {
         message: `Server Error: Couldn't update Household ${id}`,
         success: false,
@@ -305,7 +314,7 @@ describe('Unit Tests: households/:id', () => {
         payload: {
           id,
           name: expect.any(String),
-          occupants: expect.arrayContaining(expect.any(Object)),
+          occupants: expect.arrayContaining(expect.any(Number)),
         },
       };
 
@@ -315,7 +324,7 @@ describe('Unit Tests: households/:id', () => {
           return {
             id: householdId,
             name: 'Deleted Household',
-            occupants: [{}],
+            occupants: [3, 1, 5],
           };
         }
       );
@@ -394,66 +403,184 @@ describe('Unit Tests: households/:id', () => {
   );
 });
 
-describe('Unit Tests: households/name', () => {
-  test('Upon a successful GET request, the correct response is returned', async () => {});
+describe('Unit Tests: households/?name=', () => {
+  test.todo(
+    'Upon a successful GET request, the correct response is returned',
+    async () => {
+      // Arrange
+      const houseName = 'test';
+      const expected = {
+        message: `Household ${houseName}`,
+        success: true,
+        payload: [
+          {
+            id: expect.any(Number),
+            name: houseName,
+            occupants: expect.arrayContaining(expect.any(Number)),
+          },
+        ],
+      };
 
-  test('Upon an unsuccessful GET request due to user error, the correct response is returned', async () => {});
+      jest.spyOn(householdsModel, 'getHouseholdsByName');
+      householdsModel.getHouseholdsByName.mockImplementation(
+        async (searchedName) => {
+          return [
+            {
+              id: 1,
+              name: searchedName,
+              occupants: [8],
+            },
+          ];
+        }
+      );
 
-  test('Upon an unsuccessful GET request due to server error, the correct response is returned', async () => {});
+      // Act
+      const actual = await router.get(`/?name=${houseName}`);
 
-  test('Upon a successful POST request, the correct response is returned', async () => {});
+      // Assert
+      expect(actual).toStrictEqual(expected);
 
-  test('Upon an unsuccessful POST request due to user error, the correct response is returned', async () => {});
+      // Cleanup
+      householdsModel.getHouseholdsByName.mockRestore();
+    }
+  );
 
-  test('Upon an unsuccessful POST request due to server error, the correct response is returned', async () => {});
+  test.todo(
+    'Upon an unsuccessful GET request due to user error, the correct response is returned',
+    async () => {
+      // Arrange
+      const houseName = 'test';
+      const expected = {
+        message: `Bad Request: unable to retrieve Household ${houseName}`,
+        success: false,
+        status: 400,
+      };
 
-  test('Upon a successful PATCH request, the correct response is returned', async () => {});
+      jest.spyOn(householdsModel, 'getHouseholdsByName');
+      householdsModel.getHouseholdsByName.mockImplementation(
+        async (searchedName) => {
+          throw new Error(
+            `Bad Request: unable to retrieve Household ${searchedName}`
+          );
+        }
+      );
 
-  test('Upon an unsuccessful PATCH request due to user error, the correct response is returned', async () => {});
+      // Act
+      const actual = await router.get(`/?name=${houseName}`);
 
-  test('Upon an unsuccessful PATCH request due to server error, the correct response is returned', async () => {});
+      // Assert
+      expect(actual).toStrictEqual(expected);
 
-  test('Upon a successful PUT request, the correct response is returned', async () => {});
+      // Cleanup
+      householdsModel.getHouseholdsByName.mockRestore();
+    }
+  );
 
-  test('Upon an unsuccessful PUT request due to user error, the correct response is returned', async () => {});
+  test.todo(
+    'Upon an unsuccessful GET request due to server error, the correct response is returned',
+    async () => {
+      // Arrange
+      const houseName = 'test';
+      const expected = {
+        message: `Server Error: unable to retrieve Household ${houseName}`,
+        success: false,
+        status: 500,
+      };
 
-  test('Upon an unsuccessful PUT request due to server error, the correct response is returned', async () => {});
+      jest.spyOn(householdsModel, 'getHouseholdsByName');
+      householdsModel.getHouseholdsByName.mockImplementation(
+        async (searchedName) => {
+          throw new Error(
+            `Server Error: unable to retrieve Household ${searchedName}`
+          );
+        }
+      );
 
-  test('Upon a successful DELETE request, the correct response is returned', async () => {});
+      // Act
+      const actual = await router.get(`/?name=${houseName}`);
 
-  test('Upon an unsuccessful DELETE request due to user error, the correct response is returned', async () => {});
+      // Assert
+      expect(actual).toStrictEqual(expected);
 
-  test('Upon an unsuccessful DELETE request due to server error, the correct response is returned', async () => {});
+      // Cleanup
+      householdsModel.getHouseholdsByName.mockRestore();
+    }
+  );
 });
 
 describe('Unit Tests: households/:id/occupants', () => {
-  test('Upon a successful GET request, the correct response is returned', async () => {});
+  test.todo(
+    'Upon a successful GET request, the correct response is returned',
+    async () => {}
+  );
 
-  test('Upon an unsuccessful GET request due to user error, the correct response is returned', async () => {});
+  test.todo(
+    'Upon an unsuccessful GET request due to user error, the correct response is returned',
+    async () => {}
+  );
 
-  test('Upon an unsuccessful GET request due to server error, the correct response is returned', async () => {});
+  test.todo(
+    'Upon an unsuccessful GET request due to server error, the correct response is returned',
+    async () => {}
+  );
 
-  test('Upon a successful POST request, the correct response is returned', async () => {});
+  test.todo(
+    'Upon a successful POST request, the correct response is returned',
+    async () => {}
+  );
 
-  test('Upon an unsuccessful POST request due to user error, the correct response is returned', async () => {});
+  test.todo(
+    'Upon an unsuccessful POST request due to user error, the correct response is returned',
+    async () => {}
+  );
 
-  test('Upon an unsuccessful POST request due to server error, the correct response is returned', async () => {});
+  test.todo(
+    'Upon an unsuccessful POST request due to server error, the correct response is returned',
+    async () => {}
+  );
 
-  test('Upon a successful PATCH request, the correct response is returned', async () => {});
+  test.todo(
+    'Upon a successful PATCH request, the correct response is returned',
+    async () => {}
+  );
 
-  test('Upon an unsuccessful PATCH request due to user error, the correct response is returned', async () => {});
+  test.todo(
+    'Upon an unsuccessful PATCH request due to user error, the correct response is returned',
+    async () => {}
+  );
 
-  test('Upon an unsuccessful PATCH request due to server error, the correct response is returned', async () => {});
+  test.todo(
+    'Upon an unsuccessful PATCH request due to server error, the correct response is returned',
+    async () => {}
+  );
 
-  test('Upon a successful PUT request, the correct response is returned', async () => {});
+  test.todo(
+    'Upon a successful PUT request, the correct response is returned',
+    async () => {}
+  );
 
-  test('Upon an unsuccessful PUT request due to user error, the correct response is returned', async () => {});
+  test.todo(
+    'Upon an unsuccessful PUT request due to user error, the correct response is returned',
+    async () => {}
+  );
 
-  test('Upon an unsuccessful PUT request due to server error, the correct response is returned', async () => {});
+  test.todo(
+    'Upon an unsuccessful PUT request due to server error, the correct response is returned',
+    async () => {}
+  );
 
-  test('Upon a successful DELETE request, the correct response is returned', async () => {});
+  test.todo(
+    'Upon a successful DELETE request, the correct response is returned',
+    async () => {}
+  );
 
-  test('Upon an unsuccessful DELETE request due to user error, the correct response is returned', async () => {});
+  test.todo(
+    'Upon an unsuccessful DELETE request due to user error, the correct response is returned',
+    async () => {}
+  );
 
-  test('Upon an unsuccessful DELETE request due to server error, the correct response is returned', async () => {});
+  test.todo(
+    'Upon an unsuccessful DELETE request due to server error, the correct response is returned',
+    async () => {}
+  );
 });
