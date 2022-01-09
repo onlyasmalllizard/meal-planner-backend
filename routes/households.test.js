@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 const request = require('supertest');
 const router = require('./households');
 const householdsModel = require('../models/households');
@@ -6,9 +8,9 @@ describe('Unit Tests: households', () => {
   test.skip('Upon a successful GET request, the correct response is returned', async () => {
     // Arrange
     const householdObject = {
-      id: expect.any(Number),
+      id: expect.any(String),
       name: expect.any(String),
-      occupants: expect.arrayContaining(expect.any(Number)),
+      occupants: expect.arrayContaining(expect.any(String)),
     };
 
     const expected = {
@@ -20,8 +22,16 @@ describe('Unit Tests: households', () => {
     jest.spyOn(householdsModel, 'getHouseholds');
     householdsModel.getHouseholds.mockImplementation(async () => {
       return [
-        { id: 5, name: 'Mock Household 1', occupants: [3, 5, 9] },
-        { id: 4, name: 'Mock Household 2', occupants: [2, 1] },
+        {
+          id: uuidv4(),
+          name: 'Mock Household 1',
+          occupants: [uuidv4(), uuidv4(), uuidv4()],
+        },
+        {
+          id: uuidv4(),
+          name: 'Mock Household 2',
+          occupants: [uuidv4(), uuidv4()],
+        },
       ];
     });
 
@@ -75,17 +85,17 @@ describe('Unit Tests: households', () => {
 
   test.skip('Upon a successful POST request, the correct response is returned', async () => {
     // Arrange
-    const input = { name: 'Mock Household', occupants: [1, 2] };
+    const input = { name: 'Mock Household', occupants: [uuidv4(), uuidv4()] };
 
     const expected = {
       message: `Household ${input.name} added`,
       success: true,
-      payload: { id: expect.any(Number), ...input },
+      payload: { id: expect.any(String), ...input },
     };
 
     jest.spyOn(householdsModel, 'addHousehold');
     householdsModel.addHousehold.mockImplementation(async (data) => {
-      return { id: 5, ...data };
+      return { id: uuidv4(), ...data };
     });
 
     // Act and Assert
@@ -98,7 +108,7 @@ describe('Unit Tests: households', () => {
 
   test.skip('Upon an unsuccessful POST request due to user error, the correct response is returned', async () => {
     // Arrange
-    const input = { name: 'Mock Household', occupants: [1, 2] };
+    const input = { name: 'Mock Household', occupants: [uuidv4(), uuidv4()] };
 
     const expected = {
       message: `Bad Request: Couldn't add Household ${input.name}`,
@@ -120,7 +130,7 @@ describe('Unit Tests: households', () => {
 
   test.skip('Upon an unsuccessful POST request due to server error, the correct response is returned', async () => {
     // Arrange
-    const input = { name: 'Mock Household', occupants: [1, 2] };
+    const input = { name: 'Mock Household', occupants: [uuidv4(), uuidv4()] };
 
     const expected = {
       message: `Server Error: Couldn't add Household ${input.name}`,
@@ -144,20 +154,20 @@ describe('Unit Tests: households', () => {
 describe('Unit Tests: households/:id', () => {
   test.skip('Upon a successful GET request, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const expected = {
       message: `Household ${id}`,
       success: true,
       payload: {
         id,
         name: expect.any(String),
-        occupants: expect.arrayContaining(expect.any(Number)),
+        occupants: expect.arrayContaining(expect.any(String)),
       },
     };
 
     jest.spyOn(householdsModel, 'getHouseholdById');
     householdsModel.getHouseholdById.mockImplementation(async (householdId) => {
-      return { id: householdId, name: 'Mock Household', occupants: [1] };
+      return { id: householdId, name: 'Mock Household', occupants: [uuidv4()] };
     });
 
     // Act and Assert
@@ -170,7 +180,7 @@ describe('Unit Tests: households/:id', () => {
 
   test.skip('Upon an unsuccessful GET request due to user error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const expected = {
       message: `Bad Request: Couldn't retrieve Household ${id}`,
       success: false,
@@ -193,7 +203,7 @@ describe('Unit Tests: households/:id', () => {
 
   test.skip('Upon an unsuccessful GET request due to server error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const expected = {
       message: `Server Error: Couldn't retrieve Household ${id}`,
       success: false,
@@ -216,7 +226,7 @@ describe('Unit Tests: households/:id', () => {
 
   test.skip('Upon a successful PATCH request, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const input = { name: 'New Name' };
     const expected = {
       message: `Household ${id} updated`,
@@ -224,7 +234,7 @@ describe('Unit Tests: households/:id', () => {
       payload: {
         id,
         name: input.name,
-        occupants: expect.arrayContaining(expect.any(Number)),
+        occupants: expect.arrayContaining(expect.any(String)),
       },
     };
 
@@ -235,7 +245,7 @@ describe('Unit Tests: households/:id', () => {
         const object = {
           id: householdId,
           name: 'Old Name',
-          occupants: [1, 2],
+          occupants: [uuidv4(), uuidv4()],
         };
 
         keys.forEach((key) => (object[key] = data[key]));
@@ -256,7 +266,7 @@ describe('Unit Tests: households/:id', () => {
 
   test.skip('Upon an unsuccessful PATCH request due to user error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const input = { name: 'New Name' };
     const expected = {
       message: `Bad Request: Couldn't update Household ${id}`,
@@ -285,7 +295,7 @@ describe('Unit Tests: households/:id', () => {
 
   test.skip('Upon an unsuccessful PATCH request due to server error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const input = { name: 'New Name' };
     const expected = {
       message: `Server Error: Couldn't update Household ${id}`,
@@ -315,8 +325,8 @@ describe('Unit Tests: households/:id', () => {
 
   test.skip('Upon a successful PUT request, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
-    const input = { name: 'New Name', occupants: [4, 2] };
+    const id = uuidv4();
+    const input = { name: 'New Name', occupants: [uuidv4(), uuidv4()] };
     const expected = {
       message: `Server Error: Couldn't update Household ${id}`,
       success: true,
@@ -344,8 +354,8 @@ describe('Unit Tests: households/:id', () => {
 
   test.skip('Upon an unsuccessful PUT request due to user error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
-    const input = { name: 'New Name', occupants: [4, 2] };
+    const id = uuidv4();
+    const input = { name: 'New Name', occupants: [uuidv4(), uuidv4()] };
     const expected = {
       message: `Bad Request: Couldn't update Household ${id}`,
       success: false,
@@ -370,8 +380,8 @@ describe('Unit Tests: households/:id', () => {
 
   test.skip('Upon an unsuccessful PUT request due to server error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
-    const input = { name: 'New Name', occupants: [4, 2] };
+    const id = uuidv4();
+    const input = { name: 'New Name', occupants: [uuidv4(), uuidv4()] };
     const expected = {
       message: `Server Error: Couldn't update Household ${id}`,
       success: false,
@@ -396,14 +406,14 @@ describe('Unit Tests: households/:id', () => {
 
   test.skip('Upon a successful DELETE request, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const expected = {
       message: `Household ${id} deleted`,
       success: true,
       payload: {
         id,
         name: expect.any(String),
-        occupants: expect.arrayContaining(expect.any(Number)),
+        occupants: expect.arrayContaining(expect.any(String)),
       },
     };
 
@@ -412,7 +422,7 @@ describe('Unit Tests: households/:id', () => {
       return {
         id: householdId,
         name: 'Deleted Household',
-        occupants: [3, 1, 5],
+        occupants: [uuidv4(), uuidv4(), uuidv4()],
       };
     });
 
@@ -426,7 +436,7 @@ describe('Unit Tests: households/:id', () => {
 
   test.skip('Upon an unsuccessful DELETE request due to user error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const expected = {
       message: `Bad Request: Couldn't delete Household ${id}`,
       success: false,
@@ -447,7 +457,7 @@ describe('Unit Tests: households/:id', () => {
 
   test.skip('Upon an unsuccessful DELETE request due to server error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const expected = {
       message: `Server Error: Couldn't delete Household ${id}`,
       success: false,

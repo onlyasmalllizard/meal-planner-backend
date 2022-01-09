@@ -39,8 +39,8 @@ The payload key will only be present on successful requests. More detailed infor
 
 ```
 {
-  id: number;
-  occupants: Array<number>; // Numbers refer to User ID
+  id: string;
+  occupants: Array<string>; // Strings refer to User ID
 }
 ```
 
@@ -61,9 +61,9 @@ The payload key will only be present on successful requests. More detailed infor
 
 ```
 {
-  id: number;
+  id: string;
   name: string;
-  household: number; // Number refers to Household ID
+  household: string; // Number refers to Household ID
 }
 ```
 

@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 const request = require('supertest');
 const router = require('./users');
 const usersModel = require('../models/users');
@@ -6,9 +8,9 @@ describe('Unit Tests: users', () => {
   test.skip('Upon a successful GET request, the correct response is returned', async () => {
     // Arrange
     const userObject = {
-      id: expect.any(Number),
+      id: expect.any(String),
       name: expect.any(String),
-      household: expect.any(Number),
+      household: expect.any(String),
     };
 
     const expected = {
@@ -20,9 +22,9 @@ describe('Unit Tests: users', () => {
     jest.spyOn(usersModel, 'getUsers');
     usersModel.getUsers.mockImplentation(async () => {
       return [
-        { id: 2, name: 'Ghost', household: 1 },
-        { id: 7, name: 'Cirrus', household: 2 },
-        { id: 8, name: 'Cooper', household: 2 },
+        { id: uuidv4(), name: 'Ghost', household: uuidv4() },
+        { id: uuidv4(), name: 'Cirrus', household: uuidv4() },
+        { id: uuidv4(), name: 'Cooper', household: uuidv4() },
       ];
     });
 
@@ -78,14 +80,14 @@ describe('Unit Tests: users', () => {
     // Arrange
     const input = {
       name: 'Fennel',
-      household: 1,
+      household: uuidv4(),
     };
 
     const expected = {
       message: `${input.name} added`,
       success: true,
       payload: {
-        id: expect.any(Number),
+        id: expect.any(String),
         name: input.name,
         household: input.household,
       },
@@ -93,7 +95,7 @@ describe('Unit Tests: users', () => {
 
     jest.spyOn(usersModel, 'addUser');
     usersModel.addUser.mockImplentation(async (data) => {
-      return { id: 1, ...data };
+      return { id: uuidv4(), ...data };
     });
 
     // Act and Assert
@@ -108,7 +110,7 @@ describe('Unit Tests: users', () => {
     // Arrange
     const input = {
       name: 'Fennel',
-      household: 1,
+      household: uuidv4(),
     };
 
     const expected = {
@@ -136,7 +138,7 @@ describe('Unit Tests: users', () => {
     // Arrange
     const input = {
       name: 'Fennel',
-      household: 1,
+      household: uuidv4(),
     };
 
     const expected = {
@@ -161,20 +163,20 @@ describe('Unit Tests: users', () => {
 describe('Unit Tests: users/:id', () => {
   test.skip('Upon a successful GET request, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const expected = {
       message: `User ${id}`,
       success: true,
       payload: {
         id,
         name: expect.any(String),
-        household: expect.any(Number),
+        household: expect.any(String),
       },
     };
 
     jest.spyOn(usersModel, 'getUserById');
     usersModel.getUserById.mockImplentation(async (userId) => {
-      return { id: userId, name: 'Sprocket', household: 1 };
+      return { id: userId, name: 'Sprocket', household: uuidv4() };
     });
 
     // Act and Assert
@@ -187,7 +189,7 @@ describe('Unit Tests: users/:id', () => {
 
   test.skip('Upon an unsuccessful GET request due to user error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const expected = {
       message: `Bad Request: unable to retrieve User ${id}`,
       success: false,
@@ -208,7 +210,7 @@ describe('Unit Tests: users/:id', () => {
 
   test.skip('Upon an unsuccessful GET request due to server error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const expected = {
       message: `Server Error: unable to retrieve User ${id}`,
       success: false,
@@ -229,7 +231,7 @@ describe('Unit Tests: users/:id', () => {
 
   test.skip('Upon a successful PATCH request, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const input = { name: 'Ghostling' };
     const expected = {
       message: `User ${id} updated`,
@@ -237,13 +239,13 @@ describe('Unit Tests: users/:id', () => {
       payload: {
         id,
         name: input.name,
-        household: expect.any(Number),
+        household: expect.any(String),
       },
     };
 
     jest.spyOn(usersModel, 'updateUser');
     usersModel.updateUser.mockImplentation(async (userId, data) => {
-      const userObject = { id: userId, name: 'Ghost', household: 1 };
+      const userObject = { id: userId, name: 'Ghost', household: uuidv4() };
       const keys = Object.keys(data);
 
       keys.forEach((key) => (userObject[key] = data[key]));
@@ -265,7 +267,7 @@ describe('Unit Tests: users/:id', () => {
 
   test.skip('Upon an unsuccessful PATCH request due to user error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const input = { name: 'Ghostling' };
     const expected = {
       message: `Bad Request: unable to update User ${id}`,
@@ -291,7 +293,7 @@ describe('Unit Tests: users/:id', () => {
 
   test.skip('Upon an unsuccessful PATCH request due to server error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const input = { name: 'Ghostling' };
     const expected = {
       message: `Server Error: unable to update User ${id}`,
@@ -317,8 +319,8 @@ describe('Unit Tests: users/:id', () => {
 
   test.skip('Upon a successful PUT request, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
-    const input = { name: 'Ghostling', household: 1 };
+    const id = uuidv4();
+    const input = { name: 'Ghostling', household: uuidv4() };
     const expected = {
       message: `User ${id} updated`,
       success: true,
@@ -345,8 +347,8 @@ describe('Unit Tests: users/:id', () => {
 
   test.skip('Upon an unsuccessful PUT request due to user error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
-    const input = { name: 'Ghostling', household: 1 };
+    const id = uuidv4();
+    const input = { name: 'Ghostling', household: uuidv4() };
     const expected = {
       message: `Bad Request: unable to update User ${id}`,
       success: false,
@@ -368,8 +370,8 @@ describe('Unit Tests: users/:id', () => {
 
   test.skip('Upon an unsuccessful PUT request due to server error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
-    const input = { name: 'Ghostling', household: 1 };
+    const id = uuidv4();
+    const input = { name: 'Ghostling', household: uuidv4() };
     const expected = {
       message: `Server Error: unable to update User ${id}`,
       success: false,
@@ -391,20 +393,20 @@ describe('Unit Tests: users/:id', () => {
 
   test.skip('Upon a successful DELETE request, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const expected = {
       message: `User ${id} deleted`,
       success: true,
       payload: {
         id,
         name: expect.any(String),
-        household: expect.any(Number),
+        household: expect.any(String),
       },
     };
 
     jest.spyOn(usersModel, 'deleteUser');
     usersModel.deleteUser.mockImplentation(async (userId) => {
-      return { id: userId, name: 'Horrible User', household: 5 };
+      return { id: userId, name: 'Horrible User', household: uuidv4() };
     });
 
     // Act and Assert
@@ -418,7 +420,7 @@ describe('Unit Tests: users/:id', () => {
 
   test.skip('Upon an unsuccessful DELETE request due to user error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const expected = {
       message: `Bad Request: unable to delete User ${id}`,
       success: false,
@@ -439,7 +441,7 @@ describe('Unit Tests: users/:id', () => {
 
   test.skip('Upon an unsuccessful DELETE request due to server error, the correct response is returned', async () => {
     // Arrange
-    const id = 1;
+    const id = uuidv4();
     const expected = {
       message: `Server Error: unable to delete User ${id}`,
       success: false,
@@ -466,9 +468,9 @@ describe('Unit Tests: users/?name=', () => {
     const searchedName = 'Cooper';
 
     const userObject = {
-      id: expect.any(Number),
+      id: expect.any(String),
       name: expect.stringContaining(searchedName),
-      household: expect.any(Number),
+      household: expect.any(String),
     };
 
     const expected = {
@@ -480,8 +482,8 @@ describe('Unit Tests: users/?name=', () => {
     jest.spyOn(usersModel, 'getUsersByName');
     usersModel.getUsersByName.mockImplentation(async (search) => {
       return [
-        { id: 4, name: search, household: 1 },
-        { id: 5, name: `${search}son`, household: 1 },
+        { id: uuidv4(), name: search, household: uuidv4() },
+        { id: uuidv4(), name: `${search}son`, household: uuidv4() },
       ];
     });
 
