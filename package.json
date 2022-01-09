@@ -16,5 +16,10 @@
   },
   "devDependencies": {
     "supertest": "^6.1.6"
+  },
+  "jest": {
+    "extensionsToTreatAsEsm": [
+      ".js"
+    ]
   }
 }
