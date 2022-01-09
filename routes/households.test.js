@@ -237,8 +237,8 @@ describe('Unit Tests: households/:id', () => {
       },
     };
 
-    jest.spyOn(householdsModel, 'updateHouseholdById');
-    householdsModel.updateHouseholdById.mockImplementation(
+    jest.spyOn(householdsModel, 'updateHousehold');
+    householdsModel.updateHousehold.mockImplementation(
       async (householdId, data) => {
         const keys = Object.keys(data);
         const object = {
@@ -260,7 +260,7 @@ describe('Unit Tests: households/:id', () => {
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
-    householdsModel.updateHouseholdById.mockRestore();
+    householdsModel.updateHousehold.mockRestore();
   });
 
   test.skip('Upon an unsuccessful PATCH request due to user error, the correct response is returned', async () => {
@@ -272,8 +272,8 @@ describe('Unit Tests: households/:id', () => {
       success: false,
     };
 
-    jest.spyOn(householdsModel, 'updateHouseholdById');
-    householdsModel.updateHouseholdById.mockImplementation(
+    jest.spyOn(householdsModel, 'updateHousehold');
+    householdsModel.updateHousehold.mockImplementation(
       async (householdId, data) => {
         throw new Error(
           `Bad Request: Couldn't update Household ${householdId}`
@@ -289,7 +289,7 @@ describe('Unit Tests: households/:id', () => {
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
-    householdsModel.updateHouseholdById.mockRestore();
+    householdsModel.updateHousehold.mockRestore();
   });
 
   test.skip('Upon an unsuccessful PATCH request due to server error, the correct response is returned', async () => {
@@ -301,8 +301,8 @@ describe('Unit Tests: households/:id', () => {
       success: false,
     };
 
-    jest.spyOn(householdsModel, 'updateHouseholdById');
-    householdsModel.updateHouseholdById.mockImplementation(
+    jest.spyOn(householdsModel, 'updateHousehold');
+    householdsModel.updateHousehold.mockImplementation(
       async (householdId, data) => {
         throw new Error(
           `Server Error: Couldn't update Household ${householdId}`
@@ -319,7 +319,7 @@ describe('Unit Tests: households/:id', () => {
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
-    householdsModel.updateHouseholdById.mockRestore();
+    householdsModel.updateHousehold.mockRestore();
   });
 
   test.skip('Upon a successful PUT request, the correct response is returned', async () => {
@@ -336,8 +336,8 @@ describe('Unit Tests: households/:id', () => {
       },
     };
 
-    jest.spyOn(householdsModel, 'overwriteHouseholdById');
-    householdsModel.overwriteHouseholdById.mockImplementation(
+    jest.spyOn(householdsModel, 'overwriteHousehold');
+    householdsModel.overwriteHousehold.mockImplementation(
       async (householdId, data) => {
         return { id: householdId, ...data };
       }
@@ -348,7 +348,7 @@ describe('Unit Tests: households/:id', () => {
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
-    householdsModel.overwriteHouseholdById.mockRestore();
+    householdsModel.overwriteHousehold.mockRestore();
   });
 
   test.skip('Upon an unsuccessful PUT request due to user error, the correct response is returned', async () => {
@@ -360,8 +360,8 @@ describe('Unit Tests: households/:id', () => {
       success: false,
     };
 
-    jest.spyOn(householdsModel, 'overwriteHouseholdById');
-    householdsModel.overwriteHouseholdById.mockImplementation(
+    jest.spyOn(householdsModel, 'overwriteHousehold');
+    householdsModel.overwriteHousehold.mockImplementation(
       async (householdId, data) => {
         throw new Error(
           `Bad Request: Couldn't update Household ${householdId}`
@@ -374,7 +374,7 @@ describe('Unit Tests: households/:id', () => {
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
-    householdsModel.overwriteHouseholdById.mockRestore();
+    householdsModel.overwriteHousehold.mockRestore();
   });
 
   test.skip('Upon an unsuccessful PUT request due to server error, the correct response is returned', async () => {
@@ -386,8 +386,8 @@ describe('Unit Tests: households/:id', () => {
       success: false,
     };
 
-    jest.spyOn(householdsModel, 'overwriteHouseholdById');
-    householdsModel.overwriteHouseholdById.mockImplementation(
+    jest.spyOn(householdsModel, 'overwriteHousehold');
+    householdsModel.overwriteHousehold.mockImplementation(
       async (householdId, data) => {
         throw new Error(
           `Server Error: Couldn't update Household ${householdId}`
@@ -400,7 +400,7 @@ describe('Unit Tests: households/:id', () => {
     expect(actual).toStrictEqual(expected);
 
     // Cleanup
-    householdsModel.overwriteHouseholdById.mockRestore();
+    householdsModel.overwriteHousehold.mockRestore();
   });
 
   test.skip('Upon a successful DELETE request, the correct response is returned', async () => {
