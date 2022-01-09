@@ -41,7 +41,7 @@ The payload key will only be present on successful requests. More detailed infor
 {
   id: string;
   name: string;
-  occupants: Array<string>; // Strings refer to User ID
+  occupants: Array<string>; // String refers to User ID
 }
 ```
 
@@ -81,6 +81,27 @@ The payload key will only be present on successful requests. More detailed infor
 ### Plans
 
 🔨 Under construction 🔨
+**Plans Object Structure**
+
+```
+{
+  id: string;
+  date: datestring;
+  organiser: string; // String refers to User ID
+  attendees: Array<string>; // String refers to User ID
+  meal: "breakfast" || "lunch" || "dinner";
+}
+```
+
+| Request          | Path               | Response         |
+| ---------------- | ------------------ | ---------------- |
+| GET all          | /plans             | array of objects |
+| GET by ID        | /plans/:id         | object           |
+| GET by organiser | /plans/?organiser= | array of objects |
+| POST             | /plans             | object           |
+| PUT              | /plans/:id         | object           |
+| PATCH            | /plans/:id         | object           |
+| DELETE           | /plans/:id         | object           |
 
 ## Database Structure
 
