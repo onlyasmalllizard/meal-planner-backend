@@ -1,5 +1,5 @@
-const express = require('express');
-const logger = require('morgan');
+import * as express from 'express';
+import * as logger from 'morgan';
 
 const indexRouter = require('./routes/index');
 
@@ -11,4 +11,4 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use('/', indexRouter);
 
-module.exports = app;
+export default app;

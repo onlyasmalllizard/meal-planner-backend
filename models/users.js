@@ -1,3 +1,1 @@
-const getUsers = async () => {};
-
-module.exports = { getUsers };
+export const getUsers = async () => {};

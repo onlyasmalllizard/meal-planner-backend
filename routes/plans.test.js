@@ -1,8 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
-
-const request = require('supertest');
-const router = require('./plans');
-const plansModel = require('../models/plans');
+import * as request from 'supertest';
+import * as router from './plans';
+import * as plansModel from '../models/plans';
 
 describe('Unit Tests: plans', () => {
   test.skip('Upon a successful GET request, the correct response is returned', async () => {

@@ -1,3 +1,1 @@
-const getHouseholdById = async () => {};
-
-module.exports = { getHouseholdById };
+export const getHouseholdById = async () => {};
