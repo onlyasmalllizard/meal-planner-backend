@@ -40,6 +40,7 @@ The payload key will only be present on successful requests. More detailed infor
 ```
 {
   id: string;
+  name: string;
   occupants: Array<string>; // Strings refer to User ID
 }
 ```
