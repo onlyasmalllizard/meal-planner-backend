@@ -9,9 +9,11 @@
   },
   "dependencies": {
     "debug": "~2.6.9",
+    "dotenv": "^10.0.0",
     "express": "~4.16.1",
     "jest": "^27.3.1",
     "morgan": "~1.9.1",
+    "pg": "^8.7.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

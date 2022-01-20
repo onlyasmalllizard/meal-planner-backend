@@ -1,477 +1,323 @@
-import { v4 as uuidv4 } from 'uuid';
 import * as request from 'supertest';
 import * as router from './households';
 import * as householdsModel from '../models/households';
+import {
+  buildResponse,
+  serverError,
+  userError,
+  validId,
+  invalidId,
+} from '../helpers/tests';
+import {
+  householdModelThrowsError,
+  householdServerErrorResponse,
+  householdUserErrorResponse,
+  invalidInput,
+  invalidPatchInput,
+  returnManyHouseholds,
+  returnSingleHousehold,
+  sampleHousehold,
+  validInput,
+  validPatchInput,
+} from '../helpers/tests/households';
+
+const householdObject = {
+  id: expect.any(String),
+  name: expect.any(String),
+  occupants: expect.arrayContaining(expect.any(String)),
+};
+
+const mockedFunctions = Object.keys(householdsModel);
+
+beforeEach(() => {
+  mockedFunctions.forEach((mockedFunction) =>
+    jest.spyOn(householdsModel, mockedFunction)
+  );
+});
+
+afterEach(() => {
+  mockedFunctions.forEach((mockedFunction) =>
+    householdsModel[mockedFunction].mockRestore()
+  );
+});
 
 describe('Unit Tests: households', () => {
   test.skip('Upon a successful GET request, the correct response is returned', async () => {
     // Arrange
-    const householdObject = {
-      id: expect.any(String),
-      name: expect.any(String),
-      occupants: expect.arrayContaining(expect.any(String)),
-    };
+    const expected = buildResponse(
+      'All households',
+      true,
+      expect.arrayContaining(householdObject)
+    );
 
-    const expected = {
-      message: 'All households',
-      success: true,
-      payload: expect.arrayContaining(householdObject),
-    };
-
-    jest.spyOn(householdsModel, 'getHouseholds');
-    householdsModel.getHouseholds.mockImplementation(async () => {
-      return [
-        {
-          id: uuidv4(),
-          name: 'Mock Household 1',
-          occupants: [uuidv4(), uuidv4(), uuidv4()],
-        },
-        {
-          id: uuidv4(),
-          name: 'Mock Household 2',
-          occupants: [uuidv4(), uuidv4()],
-        },
-      ];
-    });
+    householdsModel.getHouseholds.mockImplementation(returnManyHouseholds);
 
     // Act and Assert
     const actual = await request(router).get('/').expect(200);
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.getHouseholds.mockRestore();
   });
 
   test.skip('Upon an unsuccessful GET request due to user error, the correct response is returned', async () => {
     // Arrange
-    const expected = {
-      message: `Bad Request: Couldn't retrieve households`,
-      success: false,
-    };
+    const expected = buildResponse(householdUserErrorResponse(), false);
 
-    jest.spyOn(householdsModel, 'getHouseholds');
-    householdsModel.getHouseholds.mockImplementation(async () => {
-      throw new Error(`Bad Request: Couldn't retrieve households`);
-    });
+    householdsModel.getHouseholds.mockImplementation(() =>
+      householdModelThrowsError(userError)
+    );
 
     // Act and Assert
     const actual = await request(router).get('/').expect(400);
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.getHouseholds.mockRestore();
   });
 
   test.skip('Upon an unsuccessful GET request due to server error, the correct response is returned', async () => {
     // Arrange
-    const expected = {
-      message: `Server Error: Couldn't retrieve households`,
-      success: false,
-    };
+    const expected = buildResponse(householdServerErrorResponse(), false);
 
-    jest.spyOn(householdsModel, 'getHouseholds');
-    householdsModel.getHouseholds.mockImplementation(async () => {
-      throw new Error(`Server Error: Couldn't retrieve households`);
-    });
+    householdsModel.getHouseholds.mockImplementation(() =>
+      householdModelThrowsError(serverError)
+    );
 
     // Act and Assert
     const actual = await request(router).get('/').expect(500);
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.getHouseholds.mockRestore();
   });
 
   test.skip('Upon a successful POST request, the correct response is returned', async () => {
     // Arrange
-    const input = { name: 'Mock Household', occupants: [uuidv4(), uuidv4()] };
+    const expected = buildResponse(
+      `Household ${validInput.name} added`,
+      true,
+      householdObject
+    );
 
-    const expected = {
-      message: `Household ${input.name} added`,
-      success: true,
-      payload: { id: expect.any(String), ...input },
-    };
-
-    jest.spyOn(householdsModel, 'addHousehold');
-    householdsModel.addHousehold.mockImplementation(async (data) => {
-      return { id: uuidv4(), ...data };
-    });
+    householdsModel.addHousehold.mockImplementation(returnSingleHousehold);
 
     // Act and Assert
-    const actual = await request(router).post('/').send(input).expect(200);
+    const actual = await request(router).post('/').send(validInput).expect(200);
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.addHousehold.mockRestore();
   });
 
   test.skip('Upon an unsuccessful POST request due to user error, the correct response is returned', async () => {
     // Arrange
-    const input = { name: 'Mock Household', occupants: [uuidv4(), uuidv4()] };
+    const expected = buildResponse(householdUserErrorResponse(), false);
 
-    const expected = {
-      message: `Bad Request: Couldn't add Household ${input.name}`,
-      success: false,
-    };
-
-    jest.spyOn(householdsModel, 'addHousehold');
-    householdsModel.addHousehold.mockImplementation(async (data) => {
-      throw new Error(`Bad Request: Couldn't add Household ${data.name}`);
-    });
+    householdsModel.addHousehold.mockImplementation(
+      async () => await householdmodelThrowsError(userError)
+    );
 
     // Act and Assert
-    const actual = await request(router).post('/').send(input).expect(400);
+    const actual = await request(router)
+      .post('/')
+      .send(invalidInput)
+      .expect(400);
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.addHousehold.mockRestore();
   });
 
   test.skip('Upon an unsuccessful POST request due to server error, the correct response is returned', async () => {
     // Arrange
-    const input = { name: 'Mock Household', occupants: [uuidv4(), uuidv4()] };
+    const expected = buildResponse(householdServerErrorResponse(), false);
 
-    const expected = {
-      message: `Server Error: Couldn't add Household ${input.name}`,
-      success: false,
-    };
-
-    jest.spyOn(householdsModel, 'addHousehold');
-    householdsModel.addHousehold.mockImplementation(async (data) => {
-      throw new Error(`Server Error: Couldn't add Household ${data.name}`);
-    });
+    householdsModel.addHousehold.mockImplementation(
+      async () => await householdmodelThrowsError(serverError)
+    );
 
     // Act and Assert
-    const actual = await request(router).post('/').send(input).expect(500);
+    const actual = await request(router).post('/').send(validInput).expect(500);
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.addHousehold.mockRestore();
   });
 });
 
 describe('Unit Tests: households/:id', () => {
   test.skip('Upon a successful GET request, the correct response is returned', async () => {
     // Arrange
-    const id = uuidv4();
-    const expected = {
-      message: `Household ${id}`,
-      success: true,
-      payload: {
-        id,
-        name: expect.any(String),
-        occupants: expect.arrayContaining(expect.any(String)),
-      },
-    };
-
-    jest.spyOn(householdsModel, 'getHouseholdById');
-    householdsModel.getHouseholdById.mockImplementation(async (householdId) => {
-      return { id: householdId, name: 'Mock Household', occupants: [uuidv4()] };
+    const expected = buildResponse(`Household ${validId}`, true, {
+      ...householdObject,
+      id: validId,
     });
 
-    // Act and Assert
-    const actual = request(router).get(`/${id}`).expect(200);
-    expect(actual).toStrictEqual(expected);
+    householdsModel.getHouseholdById.mockImplementation(
+      async () =>
+        await returnSingleHousehold({ ...sampleHousehold, id: validId })
+    );
 
-    // Cleanup
-    householdsModel.getHouseholdById.mockRestore();
+    // Act and Assert
+    const actual = request(router).get(`/${validId}`).expect(200);
+    expect(actual).toStrictEqual(expected);
   });
 
   test.skip('Upon an unsuccessful GET request due to user error, the correct response is returned', async () => {
     // Arrange
-    const id = uuidv4();
-    const expected = {
-      message: `Bad Request: Couldn't retrieve Household ${id}`,
-      success: false,
-    };
+    const expected = buildResponse(householdUserErrorResponse(), false);
 
-    jest.spyOn(householdsModel, 'getHouseholdById');
-    householdsModel.getHouseholdById.mockImplementation(async (householdId) => {
-      throw new Error(
-        `Bad Request: Couldn't retrieve Household ${householdId}}`
-      );
-    });
+    householdsModel.getHouseholdById.mockImplementation(
+      async () => await householdModelThrowsError(userError)
+    );
 
     // Act and Assert
-    const actual = request(router).get(`/${id}`).expect(400);
+    const actual = request(router).get(`/${invalidId}`).expect(400);
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.getHouseholdById.mockRestore();
   });
 
   test.skip('Upon an unsuccessful GET request due to server error, the correct response is returned', async () => {
     // Arrange
-    const id = uuidv4();
-    const expected = {
-      message: `Server Error: Couldn't retrieve Household ${id}`,
-      success: false,
-    };
+    const expected = buildResponse(householdServerErrorResponse(), false);
 
-    jest.spyOn(householdsModel, 'getHouseholdById');
-    householdsModel.getHouseholdById.mockImplementation(async (householdId) => {
-      throw new Error(
-        `Server Error: Couldn't retrieve Household ${householdId}`
-      );
-    });
+    householdsModel.getHouseholdById.mockImplementation(
+      async () => await householdmodelThrowsError(serverError)
+    );
 
     // Act and Assert
-    const actual = request(router).get(`/${id}`).expect(500);
+    const actual = request(router).get(`/${validId}`).expect(500);
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.getHouseholdById.mockRestore();
   });
 
   test.skip('Upon a successful PATCH request, the correct response is returned', async () => {
     // Arrange
-    const id = uuidv4();
-    const input = { name: 'New Name' };
-    const expected = {
-      message: `Household ${id} updated`,
-      success: true,
-      payload: {
-        id,
-        name: input.name,
-        occupants: expect.arrayContaining(expect.any(String)),
-      },
-    };
+    const expected = buildResponse(`Household ${validId} updated`, true, {
+      ...householdObject,
+      id: validId,
+      ...validPatchInput,
+    });
 
-    jest.spyOn(householdsModel, 'updateHousehold');
     householdsModel.updateHousehold.mockImplementation(
-      async (householdId, data) => {
-        const keys = Object.keys(data);
-        const object = {
-          id: householdId,
-          name: 'Old Name',
-          occupants: [uuidv4(), uuidv4()],
-        };
-
-        keys.forEach((key) => (object[key] = data[key]));
-        return object;
-      }
+      async () =>
+        await returnSingleHousehold({ ...sampleHousehold, id: validId })
     );
 
     // Act and Assert
     const actual = await request(router)
-      .patch(`/${id}`)
+      .patch(`/${validId}`)
       .send(input)
       .expect(200);
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.updateHousehold.mockRestore();
   });
 
   test.skip('Upon an unsuccessful PATCH request due to user error, the correct response is returned', async () => {
     // Arrange
-    const id = uuidv4();
-    const input = { name: 'New Name' };
-    const expected = {
-      message: `Bad Request: Couldn't update Household ${id}`,
-      success: false,
-    };
+    const expected = buildResponse(householdUserErrorResponse(), false);
 
-    jest.spyOn(householdsModel, 'updateHousehold');
     householdsModel.updateHousehold.mockImplementation(
-      async (householdId, data) => {
-        throw new Error(
-          `Bad Request: Couldn't update Household ${householdId}`
-        );
-      }
+      async () => await householdmodelThrowsError(userError)
     );
 
     // Act and Assert
     const actual = await request(router)
-      .patch(`/${id}`)
-      .send(input)
+      .patch(`/${validId}`)
+      .send(invalidPatchInput)
       .expect(400);
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.updateHousehold.mockRestore();
   });
 
   test.skip('Upon an unsuccessful PATCH request due to server error, the correct response is returned', async () => {
     // Arrange
-    const id = uuidv4();
-    const input = { name: 'New Name' };
-    const expected = {
-      message: `Server Error: Couldn't update Household ${id}`,
-      success: false,
-    };
+    const expected = buildResponse(householdServerErrorResponse(), false);
 
-    jest.spyOn(householdsModel, 'updateHousehold');
     householdsModel.updateHousehold.mockImplementation(
-      async (householdId, data) => {
-        throw new Error(
-          `Server Error: Couldn't update Household ${householdId}`
-        );
-      }
+      async () => await householdmodelThrowsError(serverError)
     );
 
     // Act and Assert
     const actual = await request(router)
-      .patch(`/${id}`)
-      .send(input)
+      .patch(`/${validId}`)
+      .send(validPatchInput)
       .expect(500);
 
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.updateHousehold.mockRestore();
   });
 
   test.skip('Upon a successful PUT request, the correct response is returned', async () => {
     // Arrange
-    const id = uuidv4();
-    const input = { name: 'New Name', occupants: [uuidv4(), uuidv4()] };
-    const expected = {
-      message: `Server Error: Couldn't update Household ${id}`,
-      success: true,
-      payload: {
-        id,
-        name: input.name,
-        occupants: input.occupants,
-      },
-    };
+    const expected = buildResponse(`Household ${validId} updated`, true, {
+      id: validId,
+      name: validInput.name,
+      occupants: validInput.occupants,
+    });
 
-    jest.spyOn(householdsModel, 'overwriteHousehold');
     householdsModel.overwriteHousehold.mockImplementation(
-      async (householdId, data) => {
-        return { id: householdId, ...data };
-      }
+      async () => await returnSingleHousehold({ id: validId, ...validInput })
     );
 
     // Act and Assert
-    const actual = await request(router).put(`/${id}`).send(input).expect(200);
+    const actual = await request(router)
+      .put(`/${validId}`)
+      .send(validInput)
+      .expect(200);
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.overwriteHousehold.mockRestore();
   });
 
   test.skip('Upon an unsuccessful PUT request due to user error, the correct response is returned', async () => {
     // Arrange
-    const id = uuidv4();
-    const input = { name: 'New Name', occupants: [uuidv4(), uuidv4()] };
-    const expected = {
-      message: `Bad Request: Couldn't update Household ${id}`,
-      success: false,
-    };
+    const expected = buildResponse(householdUserErrorResponse(), false);
 
-    jest.spyOn(householdsModel, 'overwriteHousehold');
     householdsModel.overwriteHousehold.mockImplementation(
-      async (householdId, data) => {
-        throw new Error(
-          `Bad Request: Couldn't update Household ${householdId}`
-        );
-      }
+      async () => await householdmodelThrowsError(userError)
     );
 
     // Act and Assert
-    const actual = await request(router).put(`/${id}`).send(input).expect(400);
+    const actual = await request(router)
+      .put(`/${validId}`)
+      .send(invalidInput)
+      .expect(400);
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.overwriteHousehold.mockRestore();
   });
 
   test.skip('Upon an unsuccessful PUT request due to server error, the correct response is returned', async () => {
     // Arrange
-    const id = uuidv4();
-    const input = { name: 'New Name', occupants: [uuidv4(), uuidv4()] };
-    const expected = {
-      message: `Server Error: Couldn't update Household ${id}`,
-      success: false,
-    };
+    const expected = buildResponse(householdServerErrorResponse(), false);
 
-    jest.spyOn(householdsModel, 'overwriteHousehold');
     householdsModel.overwriteHousehold.mockImplementation(
-      async (householdId, data) => {
-        throw new Error(
-          `Server Error: Couldn't update Household ${householdId}`
-        );
-      }
+      async () => await householdmodelThrowsError(serverError)
     );
 
     // Act and Assert
-    const actual = await request(router).put(`/${id}`).send(input).expect(500);
+    const actual = await request(router)
+      .put(`/${validId}`)
+      .send(validInput)
+      .expect(500);
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.overwriteHousehold.mockRestore();
   });
 
   test.skip('Upon a successful DELETE request, the correct response is returned', async () => {
     // Arrange
-    const id = uuidv4();
-    const expected = {
-      message: `Household ${id} deleted`,
-      success: true,
-      payload: {
-        id,
-        name: expect.any(String),
-        occupants: expect.arrayContaining(expect.any(String)),
-      },
-    };
-
-    jest.spyOn(householdsModel, 'deleteHousehold');
-    householdsModel.deleteHousehold.mockImplementation(async (householdId) => {
-      return {
-        id: householdId,
-        name: 'Deleted Household',
-        occupants: [uuidv4(), uuidv4(), uuidv4()],
-      };
+    const expected = buildResponse(`Household ${id} deleted`, true, {
+      id: validId,
+      ...sampleHousehold,
     });
 
-    // Act and Assert
-    const actual = await request(router).delete(`/${id}`).expect(200);
-    expect(actual).toStrictEqual(expected);
+    householdsModel.deleteHousehold.mockImplementation(
+      async () =>
+        await returnSingleHousehold({ ...sampleHousehold, id: validId })
+    );
 
-    // Cleanup
-    householdsModel.deleteHousehold.mockRestore();
+    // Act and Assert
+    const actual = await request(router).delete(`/${validId}`).expect(200);
+    expect(actual).toStrictEqual(expected);
   });
 
   test.skip('Upon an unsuccessful DELETE request due to user error, the correct response is returned', async () => {
     // Arrange
-    const id = uuidv4();
-    const expected = {
-      message: `Bad Request: Couldn't delete Household ${id}`,
-      success: false,
-    };
+    const expected = buildResponse(householdUserErrorResponse(), false);
 
-    jest.spyOn(householdsModel, 'deleteHousehold');
-    householdsModel.deleteHousehold.mockImplementation(async (householdId) => {
-      throw new Error(`Bad Request: Couldn't delete Household ${householdId}`);
-    });
+    householdsModel.deleteHousehold.mockImplementation(
+      async () => await householdmodelThrowsError(userError)
+    );
 
     // Act and Assert
-    const actual = await request(router).delete(`/${id}`).expect(400);
+    const actual = await request(router).delete(`/${invalidId}`).expect(400);
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.deleteHousehold.mockRestore();
   });
 
   test.skip('Upon an unsuccessful DELETE request due to server error, the correct response is returned', async () => {
     // Arrange
-    const id = uuidv4();
-    const expected = {
-      message: `Server Error: Couldn't delete Household ${id}`,
-      success: false,
-    };
+    const expected = buildResponse(householdServerErrorResponse(), false);
 
-    jest.spyOn(householdsModel, 'deleteHousehold');
-    householdsModel.deleteHousehold.mockImplementation(async (householdId) => {
-      throw new Error(`Server Error: Couldn't delete Household ${householdId}`);
-    });
+    householdsModel.deleteHousehold.mockImplementation(
+      async () => await householdmodelThrowsError(serverError)
+    );
 
     // Act and Assert
-    const actual = await request(router).delete(`/${id}`).expect(500);
+    const actual = await request(router).delete(`/${validId}`).expect(500);
     expect(actual).toStrictEqual(expected);
-
-    // Cleanup
-    householdsModel.deleteHousehold.mockRestore();
   });
 });
