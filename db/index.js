@@ -1,6 +1,6 @@
 import * as pg from 'pg';
 
-const pool = pg.Pool();
+const pool = new pg.Pool();
 
 export default {
   query: (text, params, callback) => {
